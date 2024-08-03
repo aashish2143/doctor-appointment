@@ -1,1 +1,7 @@
 Django==5.0.7
+pandas
+seaborn
+matplotlib
+pandas
+scikit-learn
+notebook
