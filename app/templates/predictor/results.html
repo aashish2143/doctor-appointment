@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Disease Prediction Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .result {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .result:last-child {
+            border-bottom: none;
+        }
+        .disease {
+            font-size: 1.5em;
+            color: #007BFF;
+        }
+        .probability {
+            font-size: 1.2em;
+            color: #333;
+        }
+        .description {
+            margin: 10px 0;
+            font-size: 1em;
+            color: #555;
+        }
+        .precautions {
+            list-style-type: disc;
+            margin: 10px 0 0 20px;
+        }
+        .precautions li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Disease Prediction Results</h1>
+        {% for prediction in predictions %}
+        <div class="result">
+            <div class="disease">{{ prediction.disease }}</div>
+            <div class="probability">Probability: {{ prediction.probability|floatformat:2 }}%</div>
+            <div class="description">{{ prediction.description }}</div>
+            <div>
+                <strong>Precautions:</strong>
+                <ul class="precautions">
+                    {% for precaution in prediction.precautions %}
+                    <li>{{ precaution }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

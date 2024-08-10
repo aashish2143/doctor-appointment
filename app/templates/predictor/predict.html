@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Disease Prediction</title>
+    <style>
+        .suggestions {
+            border: 1px solid #ccc;
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .suggestions li {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .suggestions li:hover {
+            background-color: #f0f0f0;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        #results h3 {
+            margin-bottom: 5px;
+        }
+        #results p {
+            margin: 0 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Disease Prediction System</h1>
+    <form id="prediction-form" method="post" action="{% url 'predictor:pre-disease' %}">
+        {% csrf_token %}
+        <label>Enter Symptoms:</label><br>
+        <input type="text" id="symptom-input" oninput="showSuggestions(this.value)" autocomplete="off">
+        <ul id="suggestions" class="suggestions"></ul>
+        <br>
+        <button type="button" onclick="addSymptom()">Add Symptom</button>
+        <button type="button" onclick="submitForm()">Predict</button>
+        <br><br>
+        <label>Selected Symptoms:</label><br>
+        <ul id="selected-symptoms"></ul>
+        <input type="hidden" name="symptoms" id="symptoms-hidden">
+    </form>
+
+    <div id="results">
+        <h3>Disease Name: <span id="disease-name"></span></h3>
+        <p><strong>Description:</strong> <span id="disease-description"></span></p>
+        <h4>Recommended Precautions:</h4>
+        <ul id="precautions-list"></ul>
+    </div>
+
+    <script>
+        const symptomsList = ['itching', 'skin rash', 'nodal skin eruptions', 'continuous sneezing', 'shivering', 'chills', 'joint pain', 'stomach pain', 'acidity', 'ulcers on tongue', 'muscle wasting', 'vomiting', 'burning micturition', 'spotting urination', 'fatigue', 'weight gain', 'anxiety', 'cold hands and feets', 'mood swings', 'weight loss', 'restlessness', 'lethargy', 'patches in throat', 'irregular sugar level', 'cough', 'high fever', 'sunken eyes', 'breathlessness', 'sweating', 'dehydration', 'indigestion', 'headache', 'yellowish skin', 'dark urine', 'nausea', 'loss of appetite', 'pain behind the eyes', 'back pain', 'constipation', 'abdominal pain', 'diarrhoea', 'mild fever', 'yellow urine', 'yellowing of eyes', 'acute liver failure', 'fluid overload', 'swelling of stomach', 'swelled lymph nodes', 'malaise', 'blurred and distorted vision', 'phlegm', 'throat irritation', 'redness of eyes', 'sinus pressure', 'runny nose', 'congestion', 'chest pain', 'weakness in limbs', 'fast heart rate', 'pain during bowel movements', 'pain in anal region', 'bloody stool', 'irritation in anus', 'neck pain', 'dizziness', 'cramps', 'bruising', 'obesity', 'swollen legs', 'swollen blood vessels', 'puffy face and eyes', 'enlarged thyroid', 'brittle nails', 'swollen extremeties', 'excessive hunger', 'extra marital contacts', 'drying and tingling lips', 'slurred speech', 'knee pain', 'hip joint pain', 'muscle weakness', 'stiff neck', 'swelling joints', 'movement stiffness', 'spinning movements', 'loss of balance', 'unsteadiness', 'weakness of one body side', 'loss of smell', 'bladder discomfort', 'foul smell ofurine', 'continuous feel of urine', 'passage of gases', 'internal itching', 'toxic look (typhos)', 'depression', 'irritability', 'muscle pain', 'altered sensorium', 'red spots over body', 'belly pain', 'abnormal menstruation', 'dischromic patches', 'watering from eyes', 'increased appetite', 'polyuria', 'family history', 'mucoid sputum', 'rusty sputum', 'lack of concentration', 'visual disturbances', 'receiving blood transfusion', 'receiving unsterile injections', 'coma', 'stomach bleeding', 'distention of abdomen', 'history of alcohol consumption', 'fluid overload', 'blood in sputum', 'prominent veins on calf', 'palpitations', 'painful walking', 'pus filled pimples', 'blackheads', 'scurring', 'skin peeling', 'silver like dusting', 'small dents in nails', 'inflammatory nails', 'blister', 'red sore around nose', 'yellow crust ooze', 'prognosis'];
+
+        function showSuggestions(value) {
+            const suggestions = document.getElementById('suggestions');
+            suggestions.innerHTML = '';
+            if (value.length === 0) {
+                suggestions.style.display = 'none';
+                return;
+            }
+            const filtered = symptomsList.filter(symptom => symptom.includes(value.toLowerCase()));
+            filtered.forEach(symptom => {
+                const li = document.createElement('li');
+                li.textContent = symptom;
+                li.onclick = () => selectSuggestion(symptom);
+                suggestions.appendChild(li);
+            });
+            suggestions.style.display = 'block';
+        }
+
+        function selectSuggestion(symptom) {
+            document.getElementById('symptom-input').value = symptom;
+            document.getElementById('suggestions').style.display = 'none';
+        }
+
+        function addSymptom() {
+            const symptomInput = document.getElementById('symptom-input');
+            const symptom = symptomInput.value.trim();
+            if (symptom === '' || !symptomsList.includes(symptom)) {
+                alert('Please enter a valid symptom');
+                return false;
+            }
+            const selectedSymptoms = document.getElementById('selected-symptoms');
+            const li = document.createElement('li');
+            li.textContent = symptom;
+            selectedSymptoms.appendChild(li);
+            symptomInput.value = '';
+
+            updateHiddenInput();
+            return false;
+        }
+
+        function updateHiddenInput() {
+            const selectedSymptoms = document.getElementById('selected-symptoms');
+            const symptomsArray = [];
+            for (const li of selectedSymptoms.children) {
+                symptomsArray.push(li.textContent);
+            }
+            document.getElementById('symptoms-hidden').value = symptomsArray.join(',');
+        }
+
+        function validateForm() {
+            updateHiddenInput();
+            const hiddenInput = document.getElementById('symptoms-hidden').value;
+            if (hiddenInput === '') {
+                alert('Please add at least one symptom before predicting.');
+                return false;
+            }
+            return true;
+        }
+
+        function submitForm() {
+            if (validateForm()) {
+                const formData = new FormData(document.getElementById('prediction-form'));
+                fetch("{% url 'predictor:pre-disease' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('disease-name').textContent = data.disease_name;
+                    document.getElementById('disease-description').textContent = data.description;
+
+                    const precautionsList = document.getElementById('precautions-list');
+                    precautionsList.innerHTML = '';
+                    data.precautions.forEach(precaution => {
+                        const li = document.createElement('li');
+                        li.textContent = precaution;
+                        precautionsList.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+    </script>
+</body>
+</html>
