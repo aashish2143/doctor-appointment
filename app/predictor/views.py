@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 # Load the model
-model = joblib.load('../models/V2/random_forest.pkl')
+model = joblib.load('../models/V2/naive_baye.pkl')
 
 df1 = pd.read_csv('../data/Symptom-severity.csv')
 df1['Symptom'] = df1['Symptom'].str.replace('_',' ')
