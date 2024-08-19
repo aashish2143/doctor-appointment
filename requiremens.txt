@@ -6,3 +6,4 @@ pandas
 scikit-learn
 notebook
 pandas-profiling 
+Pillow
