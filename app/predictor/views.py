@@ -25,11 +25,16 @@ def predd(model, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12, S13, S14, S1
                 psymptoms[j] = b[k]
     
     psy = [psymptoms]
-    print(psy)
+    
     pred2 = model.predict(psy)
+    pred_proba = model.predict_proba(psy)[0]
+    print(pred_proba)
     
     disease_name = pred2[0]
     description = discrp[discrp['Disease'] == disease_name].values[0][1]
+    
+    disease_index = np.where(model.classes_ == disease_name)[0][0]
+    probability = pred_proba[disease_index] * 100 
     
     recommendations = ektra7at[ektra7at['Disease'] == disease_name]
     c = np.where(ektra7at['Disease'] == disease_name)[0][0]
@@ -41,7 +46,8 @@ def predd(model, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12, S13, S14, S1
     result = {
         "disease_name": disease_name,
         "description": description,
-        "precautions": precautions
+        "precautions": precautions,
+        "probability": round(probability, 2)
     }
     
     return result
@@ -63,3 +69,33 @@ def predict_disease(request):
         return JsonResponse(result)
     else:
         return render(request, 'predictor/predict.html')
+
+def book_doctor(request):
+    # Get the disease name from the request (from query parameters)
+    disease_name = request.GET.get('disease_name', '')
+
+    # Read the CSV files
+    disease_specialist_df = pd.read_csv('../data/disease_specialist.csv')
+    doctor_details_df = pd.read_csv('../data/doctor_description.csv')
+
+    # Find the specialist for the given disease
+    specialist_df = disease_specialist_df[disease_specialist_df['Disease'] == disease_name]
+    if not specialist_df.empty:
+        specialist = specialist_df['Specialist'].values[0]
+    else:
+        specialist = None
+    
+    print(specialist)
+
+    # Filter doctors based on the specialist
+    if specialist:
+        doctors_df = doctor_details_df[doctor_details_df['Specialist'] == specialist]
+    else:
+        doctors_df = pd.DataFrame()  # Empty DataFrame if no specialist is found
+
+    # Convert doctors DataFrame to a list of dictionaries
+    doctors = doctors_df.to_dict(orient='records')
+    print(doctors)
+
+    # Pass the doctors and disease name to the template
+    return render(request, 'predictor/book_doctor.html', {'doctors': doctors, 'disease_name': disease_name})

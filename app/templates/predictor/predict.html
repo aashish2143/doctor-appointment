@@ -3,53 +3,224 @@
 <head>
     <title>Disease Prediction</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
         .suggestions {
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
             display: none;
             position: absolute;
             background-color: #fff;
             max-height: 150px;
             overflow-y: auto;
+            width: calc(100% - 22px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            z-index: 1000;
         }
+
         .suggestions li {
-            padding: 8px;
+            padding: 10px;
             cursor: pointer;
+            list-style-type: none;
         }
+
         .suggestions li:hover {
             background-color: #f0f0f0;
         }
-        #results {
-            margin-top: 20px;
+
+        #selected-symptoms {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
         }
-        #results h3 {
+
+        #selected-symptoms li {
+            background: #e1e1e1;
+            padding: 8px;
+            border-radius: 4px;
             margin-bottom: 5px;
         }
-        #results p {
+
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        #results h3,
+        #results p,
+        #results ul {
             margin: 0 0 10px;
         }
+
+        #results ul {
+            padding-left: 20px;
+        }
+
+        #results ul li {
+            margin-bottom: 5px;
+        }
+
+        .alert {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .modal-content {
+            padding: 20px;
+            position: relative;
+            max-width: 500px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 8px;
+        }
+
+        #book-doctor {
+            display: block;
+            width: 90%;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #book-doctor:hover {
+            background-color: #45a049;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
     <h1>Disease Prediction System</h1>
     <form id="prediction-form" method="post" action="{% url 'predictor:pre-disease' %}">
         {% csrf_token %}
-        <label>Enter Symptoms:</label><br>
+        <label for="symptom-input">Enter Symptoms:</label>
         <input type="text" id="symptom-input" oninput="showSuggestions(this.value)" autocomplete="off">
         <ul id="suggestions" class="suggestions"></ul>
         <br>
         <button type="button" onclick="addSymptom()">Add Symptom</button>
         <button type="button" onclick="submitForm()">Predict</button>
         <br><br>
-        <label>Selected Symptoms:</label><br>
+        <label>Selected Symptoms:</label>
         <ul id="selected-symptoms"></ul>
         <input type="hidden" name="symptoms" id="symptoms-hidden">
     </form>
 
-    <div id="results">
-        <h3>Disease Name: <span id="disease-name"></span></h3>
-        <p><strong>Description:</strong> <span id="disease-description"></span></p>
-        <h4>Recommended Precautions:</h4>
-        <ul id="precautions-list"></ul>
+    <!-- The Modal -->
+    <div id="resultsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="results">
+                <h4 id="probability">Probability: </h4>
+                <h3>Disease Name: <span id="disease-name"></span></h3>
+                <p><strong>Description:</strong> <span id="disease-description"></span></p>
+                <h4>Recommended Precautions:</h4>
+                <ul id="precautions-list"></ul>
+                <!-- Booking Button -->
+                <a id="book-doctor">
+                    <button>Book Doctor</button>
+                </a>                
+            </div>
+        </div>
     </div>
 
     <script>
@@ -62,7 +233,7 @@
                 suggestions.style.display = 'none';
                 return;
             }
-            const filtered = symptomsList.filter(symptom => symptom.includes(value.toLowerCase()));
+            const filtered = symptomsList.filter(symptom => symptom.toLowerCase().includes(value.toLowerCase()));
             filtered.forEach(symptom => {
                 const li = document.createElement('li');
                 li.textContent = symptom;
@@ -135,9 +306,23 @@
                         li.textContent = precaution;
                         precautionsList.appendChild(li);
                     });
+
+                    // Display only the probability of the predicted disease
+                    document.getElementById('probability').textContent = `Probability: ${data.probability}%`;
+
+                    // Update the "Book Doctor" link with the correct disease name
+                    const bookDoctorLink = document.getElementById('book-doctor');
+                    bookDoctorLink.href = `{% url 'predictor:book_doctor' %}?disease_name=${encodeURIComponent(data.disease_name)}`;
+
+                    // Show the modal
+                    document.getElementById('resultsModal').style.display = 'block';
                 })
                 .catch(error => console.error('Error:', error));
             }
+        }
+
+        function closeModal() {
+            document.getElementById('resultsModal').style.display = 'none';
         }
     </script>
 </body>
