@@ -32,9 +32,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "doctor.apps.DoctorConfig",
-    "patient.apps.PatientConfig",
     "predictor.apps.PredictorConfig",
+    "user.apps.UserConfig",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -133,3 +132,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Media files (user-uploaded files like images)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Custom User
+AUTH_USER_MODEL = 'user.User'
+AUTHENTICATION_BACKENDS = ['user.utilis.CustomAuthBackend']
