@@ -1,0 +1,33 @@
+{% extends 'main/base.html' %}
+{% block content %}
+
+<h1>Edit Patient</h1>
+<br>
+<form method="post">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+        <label for="user" class="form-label">User</label>
+        {{ form.user }}
+    </div>
+
+    <div class="mb-3">
+        <label for="date_of_birth" class="form-label">Date of Birth</label>
+        {{ form.date_of_birth }}
+    </div>
+    
+    <div class="mb-3">
+        <label for="gender" class="form-label">Gender</label>
+        {{ form.gender }}
+    </div>
+    
+    <div class="mb-3">
+        <label for="address" class="form-label">Address</label>
+        {{ form.address }}
+    </div>
+
+    <button type="submit" class="btn btn-outline-dark"><i class="bx bx-save"></i> Save</button>
+    <a href="{% url 'dashboard:patient_list' %}" class="btn btn-outline-secondary"><i class="bx bx-arrow-back"></i> Back</a>
+</form>
+
+{% endblock %}

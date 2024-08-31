@@ -1,0 +1,55 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<h1>All Users</h1>
+<br>
+<table class="table table-striped table-hover table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th scope="col">User ID</th>
+            <th scope="col">Username</th>
+            <th scope="col">Email</th>
+            <th scope="col">Email Verify</th>
+            <th scope="col">Is Staff</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if users %}
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        {% if user.is_active %}
+                            <i class='bx bx-check-circle text-success'></i>
+                        {% else %}
+                            <i class='bx bx-x-circle text-danger'></i>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.is_staff %}
+                            <i class='bx bx-check-circle text-success'></i>
+                        {% else %}
+                            <i class='bx bx-x-circle text-danger'></i>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-outline-dark">
+                            <i class="bx bx-edit"></i> Edit
+                        </a>
+                        <a href="#" class="btn btn-outline-danger">
+                            <i class="bx bx-trash"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="6">No users found</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Login</title>
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+
+<body>
+    <div class="container" id="container">
+        <div class="form-container sign-up-container">
+            <form method="POST" accept="{% url 'dashboard:register'%}">
+                {% csrf_token %}
+                <h1>Create Account</h1>
+                <br>
+                <span>Use your Email for Registration</span>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Username" required/>
+                <input type="email" class="form-control" id="registerEmail" name="registerEmail" placeholder="Email" required/>
+                <input type="password" class="form-control" id="registerPassword" name="registerPassword" placeholder="Password" required/>
+                <br>
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+        <div class="form-container sign-in-container">
+            <form method="POST" accept="{% url 'dashboard:home'%}">
+                {% csrf_token %}
+                <h1>Sign in</h1>
+                <br>
+                <span>Use your Admin Account</span>
+                <input type="text" class="form-control" id="email" name="email" placeholder="Email" required/>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Password" required/>
+                {% if messages %}
+                    <div class="error-message-container">
+                        {% for message in messages %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <a href="#">Forgot your password?</a>
+                <button type="submit" class="btn btn-primary">Sign In</button>
+            </form>
+        </div>            
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Welcome Back!</h1>
+                    <p>To keep connected with us please login with your required credentials</p>
+                    <button class="ghost" id="signIn">Sign In</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Enter your credentials details and start journey of data</p>
+                    <button class="ghost" id="signUp">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/auth.js' %}"></script>
+</body>
+
+</html>
