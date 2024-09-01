@@ -39,7 +39,7 @@
                         <a href="{% url 'dashboard:edit_doctor' doctor.id %}" class="btn btn-outline-dark">
                             <i class="bx bx-edit"></i> Edit
                         </a>
-                        <a href="#" class="btn btn-outline-danger">
+                        <a href="{% url 'dashboard:delete_doctor' doctor.id %}" class="btn btn-outline-danger">
                             <i class="bx bx-trash"></i> Delete
                         </a>
                     </td>

@@ -1,0 +1,16 @@
+<!-- dashboard/confirm_delete_doctor.html -->
+
+{% extends 'main/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Confirm Delete Doctor</h2>
+    <p>Are you sure you want to delete doctor <strong>{{ doctor.user.get_full_name }}</strong> (Username: {{ doctor.user.username }})?</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'dashboard:doctor_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

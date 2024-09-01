@@ -93,3 +93,25 @@ def edit_patient(request, patient_id):
         form = PatientEditForm(instance=patient)
     
     return render(request, 'dashboard/edit_patient.html', {'form': form, 'patient': patient})
+
+@login_required
+def delete_patient(request, patient_id):
+    patient = get_object_or_404(Patient, id=patient_id)
+    if request.method == 'POST':
+        user = patient.user
+        patient.delete() 
+        user.delete()     
+        messages.success(request, 'Patient deleted successfully.')
+        return redirect('dashboard:patient_list')
+    return render(request, 'dashboard/confirm_delete_patient.html', {'patient': patient})
+
+@login_required
+def delete_doctor(request, doctor_id):
+    doctor = get_object_or_404(Doctor, id=doctor_id)
+    if request.method == 'POST':
+        user = doctor.user
+        doctor.delete()  
+        user.delete()
+        messages.success(request, 'Doctor deleted successfully.')
+        return redirect('dashboard:doctor_list')
+    return render(request, 'dashboard/confirm_delete_doctor.html', {'doctor': doctor})
